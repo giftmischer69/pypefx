@@ -1,0 +1,135 @@
+!!python/object:squash.shell.Rack
+graph:
+  bass_fx_01:
+  - combiner
+  - null
+  bass_proc:
+  - bass_fx_01
+  - null
+  combiner:
+  - output_fx_01
+  - null
+  drum_fx_01:
+  - combiner
+  - null
+  drum_proc:
+  - drum_fx_01
+  - null
+  input:
+  - to_wav
+  - null
+  other_fx_01:
+  - combiner
+  - null
+  other_proc:
+  - other_fx_01
+  - null
+  output:
+  - null
+  output_fx_01:
+  - output_fx_02
+  - null
+  output_fx_02:
+  - output_fx_03
+  - null
+  output_fx_03:
+  - output
+  - null
+  slow:
+  - spleeter
+  - null
+  spleeter:
+  - bass_proc
+  - vocal_proc
+  - drum_proc
+  - other_proc
+  - null
+  to_wav:
+  - slow
+  - null
+  vocal_fx_01:
+  - combiner
+  - null
+  vocal_proc:
+  - vocal_fx_01
+  - null
+nodes:
+  bass_fx_01: !!python/object:squash.shell.EffectNode
+    effect: !!python/object:squash.shell.Effect
+      dll: null
+      fxp: null
+      name: bass_fx_01
+    input_volume: 100
+    name: bass_fx_01
+    output_volume: 100
+  bass_proc: !!python/object:squash.shell.ProcessingNode
+    name: bass_proc
+  combiner: !!python/object:squash.shell.CombinerNode
+    name: Combiner
+  drum_fx_01: !!python/object:squash.shell.EffectNode
+    effect: !!python/object:squash.shell.Effect
+      dll: null
+      fxp: null
+      name: drum_fx_01
+    input_volume: 100
+    name: drum_fx_01
+    output_volume: 100
+  drum_proc: !!python/object:squash.shell.ProcessingNode
+    name: drum_proc
+  input: !!python/object:squash.shell.InputNode
+    input_volume: 100
+    name: input
+  other_fx_01: !!python/object:squash.shell.EffectNode
+    effect: !!python/object:squash.shell.Effect
+      dll: null
+      fxp: null
+      name: other_fx_01
+    input_volume: 100
+    name: other_fx_01
+    output_volume: 100
+  other_proc: !!python/object:squash.shell.ProcessingNode
+    name: other_proc
+  output: !!python/object:squash.shell.OutputNode
+    input_volume: 100
+    name: output
+  output_fx_01: !!python/object:squash.shell.EffectNode
+    effect: !!python/object:squash.shell.Effect
+      dll: null
+      fxp: null
+      name: output_fx_01
+    input_volume: 100
+    name: output_fx_01
+    output_volume: 100
+  output_fx_02: !!python/object:squash.shell.EffectNode
+    effect: !!python/object:squash.shell.Effect
+      dll: null
+      fxp: null
+      name: output_fx_02
+    input_volume: 100
+    name: output_fx_02
+    output_volume: 100
+  output_fx_03: !!python/object:squash.shell.EffectNode
+    effect: !!python/object:squash.shell.Effect
+      dll: null
+      fxp: null
+      name: output_fx_03
+    input_volume: 100
+    name: output_fx_03
+    output_volume: 100
+  slow: !!python/object:squash.shell.ProcessingNode
+    name: slow
+  spleeter: !!python/object:squash.shell.SpleeterNode
+    name: spleeter
+  to_wav: !!python/object:squash.shell.ProcessingNode
+    name: to_wav
+  vocal_fx_01: !!python/object:squash.shell.EffectNode
+    effect: !!python/object:squash.shell.Effect
+      dll: null
+      fxp: null
+      name: vocal_fx_01
+    input_volume: 100
+    name: vocal_fx_01
+    output_volume: 100
+  vocal_proc: !!python/object:squash.shell.ProcessingNode
+    name: vocal_proc
+project_name: test01

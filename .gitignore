@@ -1,5 +1,14 @@
+# Audio files
+*.mp3
+*.wav
+*.flac
+
+# DAG
+graph
+graph.pdf
+
 # VST plugins
-effects
+plugins
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
