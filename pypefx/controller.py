@@ -49,7 +49,7 @@ def main(cfg: DictConfig):
     if debug:
         logging.basicConfig(level=logging.DEBUG)
         logging.debug(f"debug: {debug}")
-        
+
     if "input" not in cfg:
         input_file = ask_audio_file_tkinter()
     else:
