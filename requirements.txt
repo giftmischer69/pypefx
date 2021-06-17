@@ -1,2 +1,7 @@
 wasabi~=0.8.2
-click~=7.1.2
+spleeter
+dearpygui
+sox~=1.4.1
+numpy~=1.18.5
+tqdm~=4.61.1
+omegaconf~=2.1.0

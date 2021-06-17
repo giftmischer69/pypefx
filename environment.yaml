@@ -1,0 +1,12 @@
+name: effectsrack
+channels:
+  - conda-forge
+  - groakat
+dependencies:
+  - python=3.8
+  - ffmpeg
+  - sox
+  - libsndfile
+  - pip
+  - pip:
+    - -r requirements.txt
