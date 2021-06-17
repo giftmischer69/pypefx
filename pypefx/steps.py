@@ -195,7 +195,7 @@ class SpleeterStep(Step):
         temp_bass_payload = Payload()
         temp_other_payload = Payload()
 
-        for file in project_files:
+        for file in project_files: # TODO Process split files File Based like @ "D:\genos.se\effectsrack\squash.py"
             logging.debug(f"processing split file: {file}")
             if "vocals" in file:
                 temp_vocal_payload.message = sox.Transformer().build_array(

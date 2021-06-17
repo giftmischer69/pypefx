@@ -60,21 +60,21 @@ def main(cfg: DictConfig):
     else:
         output_file = cfg[
             "output"
-        ]  # TODO: cli arg, cli arg -> replace suffix with _screwed.wav
+        ]
 
     pipeline = Pipeline()
 
     # pipeline.add_step(SoxBassStep(6))
     # pipeline.add_step(SoxGainStep(-3, True, True))
-    pipeline.add_step(
-        SpleeterStep(
-            bass_steps=[SoxGainStep(9)],
-            drum_steps=[SoxBassStep(9)],
-            vocal_steps=[SoxGainStep(-3)],
-            other_steps=[SoxGainStep(-3)],
-            combine_type=SoxCombineType.MERGE,
-        )
-    )
+    # pipeline.add_step(
+    #     SpleeterStep(
+    #         bass_steps=[SoxGainStep(9)],
+    #         drum_steps=[SoxBassStep(9)],
+    #         vocal_steps=[SoxGainStep(-3)],
+    #         other_steps=[SoxGainStep(-3)],
+    #         combine_type=SoxCombineType.MERGE,
+    #     )
+    # )
     # pipeline.add_step(
     #     VstStep(
     #         "plugins\\effects\\ChowTape-Win64\\Win64\\CHOWTapeModel.dll",

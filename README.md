@@ -1,8 +1,26 @@
 # pypefx
 
+apply an effects pipeline to a song.
 
+## Cli Usage:
 
-apply effects to a song.
+````shell
+python -m pypefx
+
+python -m pypefx +input="song.mp3" 
+
+python -m pypefx +input="song.mp3" ++output="output.wav"
+````
+
+## Gui Usage:
+
+````shell
+python -m pypefx ++mode=gui
+````
+
+<hr>
+
+## How it works:
 
 ````text
 ┌─────┐                                             
@@ -30,6 +48,9 @@ apply effects to a song.
 │output│                                            
 └──────┘    
 ````
+
 [diagram source](https://arthursonzogni.com/Diagon/#GraphDAG)
+
+## VST Effects Source
 
 http://vstplanet.com/Effects/Effects.htm
