@@ -11,9 +11,12 @@ from pypefx.command_runner import CommandRunner
 
 
 class Payload:
-    def __init__(self, input_file: str):
+    def __init__(self, input_file: str = None):
         self.sample_rate = 44100
-        self.message: ndarray = self.get_wav_input_array(input_file)
+        if input_file:
+            self.message: ndarray = self.get_wav_input_array(input_file)
+        else:
+            self.message = None
 
     def get_wav_input_array(self, input_file: str):
         msg.info(f"Preparing input_file: {input_file}")

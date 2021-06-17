@@ -14,4 +14,4 @@ hydra:
   run:
     dir: .
   output_subdir: null
-  verbose: False
+  verbose: True

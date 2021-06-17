@@ -1,4 +1,6 @@
-# squash
+# pypefx
+
+
 
 apply effects to a song.
 

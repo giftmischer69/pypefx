@@ -17,6 +17,8 @@ from pypefx.steps import (
     SoxGainStep,
     SoxCombineType,
     SoxTempoStep,
+    SoxSpeedStep,
+    Vst32Step,
 )
 
 from tkinter import filedialog
@@ -47,8 +49,7 @@ def main(cfg: DictConfig):
     if debug:
         logging.basicConfig(level=logging.DEBUG)
         logging.debug(f"debug: {debug}")
-        logging.debug(f"CONFIG: {OmegaConf.to_yaml(cfg)}")
-
+        
     if "input" not in cfg:
         input_file = ask_audio_file_tkinter()
     else:
@@ -63,22 +64,38 @@ def main(cfg: DictConfig):
 
     pipeline = Pipeline()
 
-    pipeline.add_step(SoxTempoStep(0.84))
-    # pipeline.add_step(SpleeterStep([SoxBassStep(3)], [SoxBassStep(3)], [SoxGainStep(-3)], [SoxGainStep(-1)],
-    #                                combine_type=SoxCombineType.MERGE))
+    # pipeline.add_step(SoxBassStep(6))
+    # pipeline.add_step(SoxGainStep(-3, True, True))
     pipeline.add_step(
-        VstStep(
-            "plugins\\effects\\ChowTape-Win64\\Win64\\CHOWTapeModel.dll",
-            "plugins\\effects\\ChowTape-Win64\\CHOWTapeModel Sink_Gritty.fxp",
+        SpleeterStep(
+            bass_steps=[SoxGainStep(9)],
+            drum_steps=[SoxBassStep(9)],
+            vocal_steps=[SoxGainStep(-3)],
+            other_steps=[SoxGainStep(-3)],
+            combine_type=SoxCombineType.MERGE,
         )
     )
-    pipeline.add_step(
-        VstStep(
-            "plugins\\effects\\ADF05_RoughRider_310\\RoughRider3.dll",
-            "plugins\\effects\\ADF05_RoughRider_310\\RoughRider3 OG - 04 - Good One.fxp",
-        )
-    )
-    pipeline.add_step(SoxGainStep(0, True, True))
+    # pipeline.add_step(
+    #     VstStep(
+    #         "plugins\\effects\\ChowTape-Win64\\Win64\\CHOWTapeModel.dll",
+    #         "plugins\\effects\\ChowTape-Win64\\CHOWTapeModel Sink_Gritty.fxp",
+    #     )
+    # )
+    # pipeline.add_step(
+    #     VstStep(
+    #         "plugins\\effects\\ADF05_RoughRider_310\\RoughRider3.dll",
+    #         "plugins\\effects\\ADF05_RoughRider_310\\RoughRider3 OG - 04 - Good One.fxp",
+    #     )
+    # )
+    # pipeline.add_step(
+    #     Vst32Step(
+    #         "plugins\\effects\\OCD_DSP_Virtue\\OCD DSP Virtue.dll",
+    #         "plugins\\effects\\OCD_DSP_Virtue\\Digi Limiter   .fxp"
+    #     )
+    # )
+
+    # pipeline.add_step(SoxGainStep(0, False, True))
+    pipeline.add_step(SoxSpeedStep(0.84))
     pipeline.add_step(ExportStep(output_file))
 
     payload = Payload(input_file)
