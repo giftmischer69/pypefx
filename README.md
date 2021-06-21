@@ -54,3 +54,13 @@ python -m pypefx ++mode=gui
 ## VST Effects Source
 
 http://vstplanet.com/Effects/Effects.htm
+
+## TODOs
+- code
+  - add youtube url support as input
+  - node-based gui internals
+  - add tests
+- infrastructure
+  - add setup.py
+  - add building exe
+  - add pybuilder  
