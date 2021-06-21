@@ -1,4 +1,4 @@
-mode: cli # gui # shell
+mode: cli # gui # cli # shell
 debug: True # False
 user_name: anon
 output: "output.wav"

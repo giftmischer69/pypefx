@@ -62,6 +62,35 @@ class SoxBassStep(Step):
         return p
 
 
+class SoxDitherStep(Step):
+    def __init__(self):
+        pass
+
+    def process(self, p: Payload) -> Payload:
+        temp_input_file = "temp_input.wav"
+        temp_output_file = "temp_output.wav"
+
+        # p.message to file
+        sox.Transformer().build(
+            output_filepath=temp_input_file,
+            input_array=p.message,
+            sample_rate_in=p.sample_rate,
+        )
+
+        # Bitrate? : -b 8
+        apply_vst_cmd = f"sox {temp_input_file} -r 44100 -c 2 {temp_output_file} dither"
+        CommandRunner.run_checked(apply_vst_cmd)
+
+        # p.message = read new file to array
+        p.message = sox.Transformer().build_array(input_filepath=temp_output_file)
+
+        # remove temp files
+        os.remove(temp_input_file)
+        os.remove(temp_output_file)
+
+        return p
+
+
 class SoxGainStep(Step):
     def __init__(self, gain_db: float, normalize: bool = True, limiter: bool = False):
         self.limiter = limiter
@@ -195,7 +224,11 @@ class SpleeterStep(Step):
         temp_bass_payload = Payload()
         temp_other_payload = Payload()
 
-        for file in project_files: # TODO Process split files File Based like @ "D:\genos.se\effectsrack\squash.py"
+        for (
+            file
+        ) in (
+            project_files
+        ):  # TODO Process split files File Based like @ "D:\genos.se\effectsrack\squash.py"
             logging.debug(f"processing split file: {file}")
             if "vocals" in file:
                 temp_vocal_payload.message = sox.Transformer().build_array(
