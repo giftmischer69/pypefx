@@ -15,6 +15,7 @@ from wasabi import msg
 
 from pypefx.commandrunner import CommandRunner
 from pypefx.payload import Payload
+from pypefx.transformersingleton import TransformerSingleton
 
 
 class Step(ABC):
@@ -29,9 +30,10 @@ class SoxTempoStep(Step):
 
     def process(self, p: Payload) -> Payload:
         logging.debug("SoxTempoStep process")
-        tfm = sox.Transformer()
+        tfm = TransformerSingleton.instance()
         tfm.tempo(self.factor)
         p.message = tfm.build_array(input_array=p.message, sample_rate_in=p.sample_rate)
+        tfm.clear_effects()
         return p
 
 
@@ -41,9 +43,10 @@ class SoxSpeedStep(Step):
 
     def process(self, p: Payload) -> Payload:
         logging.debug("SoxTempoStep process")
-        tfm = sox.Transformer()
+        tfm = TransformerSingleton.instance()
         tfm.speed(self.factor)
         p.message = tfm.build_array(input_array=p.message, sample_rate_in=p.sample_rate)
+        tfm.clear_effects()
         return p
 
 
@@ -56,9 +59,10 @@ class SoxBassStep(Step):
 
     def process(self, p: Payload) -> Payload:
         logging.debug("SoxBassStep process")
-        tfm = sox.Transformer()
+        tfm = TransformerSingleton.instance()
         tfm.bass(self.gain_db, self.frequency, self.slope)
         p.message = tfm.build_array(input_array=p.message, sample_rate_in=p.sample_rate)
+        tfm.clear_effects()
         return p
 
 
@@ -71,7 +75,7 @@ class SoxDitherStep(Step):
         temp_output_file = "temp_output.wav"
 
         # p.message to file
-        sox.Transformer().build(
+        TransformerSingleton.instance().build(
             output_filepath=temp_input_file,
             input_array=p.message,
             sample_rate_in=p.sample_rate,
@@ -82,7 +86,8 @@ class SoxDitherStep(Step):
         CommandRunner.run_checked(apply_vst_cmd)
 
         # p.message = read new file to array
-        p.message = sox.Transformer().build_array(input_filepath=temp_output_file)
+        p.message = TransformerSingleton.instance().build_array(input_filepath=temp_output_file,
+                                                                sample_rate_in=p.sample_rate)
 
         # remove temp files
         os.remove(temp_input_file)
@@ -100,9 +105,10 @@ class SoxGainStep(Step):
 
     def process(self, p: Payload) -> Payload:
         logging.debug("SoxBassStep process")
-        tfm = sox.Transformer()
+        tfm = TransformerSingleton.instance()
         tfm.gain(self.gain_db, self.normalize, self.limiter)
         p.message = tfm.build_array(input_array=p.message, sample_rate_in=p.sample_rate)
+        tfm.clear_effects()
         return p
 
 
@@ -125,7 +131,7 @@ class VstStep(Step):
         temp_output_file = "temp_output.wav"
 
         # p.message to file
-        sox.Transformer().build(
+        TransformerSingleton.instance().build(
             output_filepath=temp_input_file,
             input_array=p.message,
             sample_rate_in=p.sample_rate,
@@ -136,7 +142,8 @@ class VstStep(Step):
         CommandRunner.run_checked(apply_vst_cmd)
 
         # p.message = read new file to array
-        p.message = sox.Transformer().build_array(input_filepath=temp_output_file)
+        p.message = TransformerSingleton.instance().build_array(input_filepath=temp_output_file,
+                                                                sample_rate_in=p.sample_rate)
 
         # remove temp files
         os.remove(temp_input_file)
@@ -157,7 +164,7 @@ class Vst32Step(Step):
         temp_output_file = "temp_output.wav"
 
         # p.message to file
-        sox.Transformer().build(
+        TransformerSingleton.instance().build(
             output_filepath=temp_input_file,
             input_array=p.message,
             sample_rate_in=p.sample_rate,
@@ -168,7 +175,8 @@ class Vst32Step(Step):
         CommandRunner.run_checked(apply_vst_cmd)
 
         # p.message = read new file to array
-        p.message = sox.Transformer().build_array(input_filepath=temp_output_file)
+
+        p.message = TransformerSingleton.instance().build_array(input_filepath=temp_output_file)
 
         # remove temp files
         os.remove(temp_input_file)
@@ -187,12 +195,12 @@ class SoxCombineType(Enum):
 
 class SpleeterStep(Step):
     def __init__(
-        self,
-        bass_steps: List[Step],
-        drum_steps: List[Step],
-        vocal_steps: List[Step],
-        other_steps: List[Step],
-        combine_type: SoxCombineType,
+            self,
+            bass_steps: List[Step],
+            drum_steps: List[Step],
+            vocal_steps: List[Step],
+            other_steps: List[Step],
+            combine_type: SoxCombineType,
     ):
         self.combine_type = combine_type
         self.other_steps = other_steps
@@ -204,7 +212,7 @@ class SpleeterStep(Step):
         temp_dir_name = "".join(random.choice(string.ascii_lowercase) for i in range(8))
         Path(temp_dir_name).mkdir()
         temp_file_name = f"{temp_dir_name}.wav"
-        sox.Transformer().build(
+        TransformerSingleton.instance().build(
             input_array=p.message,
             sample_rate_in=p.sample_rate,
             output_filepath=temp_file_name,
@@ -225,35 +233,39 @@ class SpleeterStep(Step):
         temp_other_payload = Payload()
 
         for (
-            file
+                file
         ) in (
-            project_files
+                project_files
         ):  # TODO Process split files File Based like @ "D:\genos.se\effectsrack\squash.py"
             logging.debug(f"processing split file: {file}")
             if "vocals" in file:
-                temp_vocal_payload.message = sox.Transformer().build_array(
-                    input_filepath=file
+                temp_vocal_payload.message = TransformerSingleton.instance().build_array(
+                    input_filepath=file,
+                    sample_rate_in=temp_vocal_payload.sample_rate
                 )
                 for step in self.vocal_steps:
                     logging.debug(f"doing step:{type(step)} for file {file}")
                     temp_vocal_payload = step.process(temp_vocal_payload)
             elif "drums" in file:
-                temp_drum_payload.message = sox.Transformer().build_array(
-                    input_filepath=file
+                temp_drum_payload.message = TransformerSingleton.instance().build_array(
+                    input_filepath=file,
+                    sample_rate_in=temp_drum_payload.sample_rate
                 )
                 for step in self.vocal_steps:
                     logging.debug(f"doing step:{type(step)} for file {file}")
                     temp_drum_payload = step.process(temp_drum_payload)
             elif "bass" in file:
-                temp_bass_payload.message = sox.Transformer().build_array(
-                    input_filepath=file
+                temp_bass_payload.message = TransformerSingleton.instance().build_array(
+                    input_filepath=file,
+                    sample_rate_in=temp_bass_payload.sample_rate
                 )
                 for step in self.vocal_steps:
                     logging.debug(f"doing step:{type(step)} for file {file}")
                     temp_bass_payload = step.process(temp_bass_payload)
             elif "other" in file:
-                temp_other_payload.message = sox.Transformer().build_array(
-                    input_filepath=file
+                temp_other_payload.message = TransformerSingleton.instance().build_array(
+                    input_filepath=file,
+                    sample_rate_in=temp_other_payload.sample_rate
                 )
                 for step in self.vocal_steps:
                     logging.debug(f"doing step:{type(step)} for file {file}")
@@ -268,20 +280,20 @@ class SpleeterStep(Step):
         temp_file_names = []
         for payload in temp_payloads:
             temp_name = (
-                "".join(random.choice(string.ascii_lowercase) for i in range(8))
-                + ".wav"
+                    "".join(random.choice(string.ascii_lowercase) for i in range(8))
+                    + ".wav"
             )
             temp_file_names.append(temp_name)
-            sox.Transformer().build(
+            TransformerSingleton.instance().build(
                 input_array=payload.message,
                 sample_rate_in=payload.sample_rate,
                 output_filepath=temp_name,
             )
 
         combined_file_name = (
-            "combined_"
-            + "".join(random.choice(string.ascii_lowercase) for i in range(8))
-            + ".wav"
+                "combined_"
+                + "".join(random.choice(string.ascii_lowercase) for i in range(8))
+                + ".wav"
         )
 
         mix_mode = self.combine_type.name
@@ -296,7 +308,8 @@ class SpleeterStep(Step):
                 combine_type=mix_mode,
             )
 
-            p.message = sox.Transformer().build_array(input_filepath=combined_file_name)
+            p.message = TransformerSingleton.instance().build_array(input_filepath=combined_file_name,
+                                                                    sample_rate_in=p.sample_rate)
         finally:
             shutil.rmtree(temp_dir_name)
             for file_name in temp_file_names:
@@ -314,7 +327,7 @@ class ExportStep(Step):
 
     def process(self, p: Payload) -> Payload:
         msg.info(f"Exporting {self.output_file}")
-        sox.Transformer().build(
+        TransformerSingleton.instance().build(
             input_array=p.message,
             sample_rate_in=p.sample_rate,
             output_filepath=self.output_file,

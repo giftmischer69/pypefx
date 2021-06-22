@@ -9,7 +9,8 @@ from wasabi import msg
 from pypefx._version import __version__
 from pypefx.pipeline import Pipeline
 from pypefx.shell import Shell
-from pypefx.steps import PrintStep, ExportStep
+from pypefx.steps import PrintStep, ExportStep, SoxDitherStep, SoxSpeedStep, SoxGainStep, SoxBassStep, VstStep, \
+    SpleeterStep, SoxCombineType
 
 
 def version() -> str:
@@ -18,6 +19,45 @@ def version() -> str:
 
 def goodbye() -> None:
     msg.good("Goodbye :)")
+
+
+def temp_debug_sound(pipeline):
+    pipeline.add_step(SoxDitherStep())
+    pipeline.add_step(SoxBassStep(6))
+    pipeline.add_step(SoxGainStep(-3, True, True))
+    # pipeline.add_step(
+    #    SpleeterStep(
+    #        bass_steps=[SoxGainStep(9)],
+    #        drum_steps=[SoxBassStep(9)],
+    #        vocal_steps=[SoxGainStep(-3)],
+    #        other_steps=[SoxGainStep(-3)],
+    #        combine_type=SoxCombineType.MERGE,
+    #    )
+    # )
+    pipeline.add_step(
+        VstStep(
+            "plugins\\effects\\ChowTape-Win64\\Win64\\CHOWTapeModel.dll",
+            "plugins\\effects\\ChowTape-Win64\\CHOWTapeModel Sink_Gritty.fxp",
+        )
+    )
+    # pipeline.add_step(
+    #     VstStep(
+    #         "plugins\\effects\\ADF05_RoughRider_310\\RoughRider3.dll",
+    #         "plugins\\effects\\ADF05_RoughRider_310\\RoughRider3 OG - 04 - Good One.fxp",
+    #     )
+    # )
+    # pipeline.add_step(
+    #     Vst32Step(
+    #         "plugins\\effects\\OCD_DSP_Virtue\\OCD DSP Virtue.dll",
+    #         "plugins\\effects\\OCD_DSP_Virtue\\Digi Limiter   .fxp"
+    #     )
+    # )
+
+    # pipeline.add_step(SoxGainStep(0, False, True))
+    pipeline.add_step(SoxSpeedStep(0.84))
+    pipeline.add_step(SoxDitherStep())
+    pipeline.add_step(ExportStep("debug_audio.wav"))
+    return pipeline
 
 
 @hydra.main(config_path="..", config_name="..\\defaults")
@@ -55,6 +95,7 @@ def hydra_main(cfg: DictConfig) -> None:
         goodbye()
         return
     elif "shell" == mode:
+        pipeline = temp_debug_sound(pipeline)
         s = Shell(pipeline=pipeline, cfg=cfg)
         s.cmdloop()
         goodbye()

@@ -2,7 +2,7 @@
 
 apply an effects pipeline to a song.
 
-## Cli Usage:
+## Usage:
 
 ````shell
 # cli usage: 
@@ -15,14 +15,11 @@ python -m pypefx ++mode=shell
 
 python -m pypefx +input="song.mp3" ++output="output.wav"
 
+# gui usage:
+python -m pypefx ++mode=gui
+
 # enabling debug logging:
 python -m pypefx hydra.verbose=True
-````
-
-## Gui Usage:
-
-````shell
-python -m pypefx ++mode=gui
 ````
 
 <hr>
