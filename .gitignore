@@ -1,6 +1,9 @@
 # temp
 ____pypefx
 
+# pypefx projects
+projects
+
 # dist & build for pyinstaller
 build
 dist
