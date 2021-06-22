@@ -4,10 +4,10 @@ import shutil
 from pathlib import Path
 
 import sox
-from numpy.core._multiarray_umath import ndarray
+from numpy.core.multiarray import ndarray
 from wasabi import msg
 
-from pypefx.command_runner import CommandRunner
+from pypefx.commandrunner import CommandRunner
 
 
 class Payload:

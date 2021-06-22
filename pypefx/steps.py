@@ -3,7 +3,7 @@ import os
 import random
 import shutil
 import string
-from abc import ABC, abstractmethod
+from abc import abstractmethod, ABC
 from enum import Enum
 from glob import glob
 from pathlib import Path
@@ -13,7 +13,7 @@ from typing import List
 import sox
 from wasabi import msg
 
-from pypefx.command_runner import CommandRunner
+from pypefx.commandrunner import CommandRunner
 from pypefx.payload import Payload
 
 
