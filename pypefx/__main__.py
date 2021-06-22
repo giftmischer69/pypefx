@@ -1,4 +1,4 @@
-from pypefx.controller import main
+from pypefx.pypefx import main
 
 if __name__ == "__main__":
     main()

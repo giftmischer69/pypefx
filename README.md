@@ -5,11 +5,18 @@ apply an effects pipeline to a song.
 ## Cli Usage:
 
 ````shell
+# cli usage: 
 python -m pypefx
 
-python -m pypefx +input="song.mp3" 
+python -m pypefx ++mode=cli +input="song.mp3" +profile=profile_name 
+
+# shell usage:
+python -m pypefx ++mode=shell  
 
 python -m pypefx +input="song.mp3" ++output="output.wav"
+
+# enabling debug logging:
+python -m pypefx hydra.verbose=True
 ````
 
 ## Gui Usage:
@@ -56,11 +63,12 @@ python -m pypefx ++mode=gui
 http://vstplanet.com/Effects/Effects.htm
 
 ## TODOs
+
 - code
-  - add youtube url support as input
-  - node-based gui internals
-  - add tests
+    - add youtube url support as input
+    - node-based gui internals
+    - add tests
 - infrastructure
-  - add setup.py
-  - add building exe
-  - add pybuilder  
+    - add setup.py
+    - add building exe
+    - add pybuilder  

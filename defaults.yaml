@@ -1,17 +1,17 @@
-mode: cli # shell # TODO: GUI
+mode: cli # shell # TODO: gui
 user_name: anon
-output: "output_screwed.wav"
+hydra:
+  run:
+    dir: .
+  output_subdir: null
+  verbose: False # True # This is the Debug Flag
 fx:
   mrs_watson_32_exe_path: "plugins/tools/MrsWatson-0.9.8/Windows/mrswatson.exe"
   mrs_watson_64_exe_path: "plugins/tools/MrsWatson-0.9.8/Windows/mrswatson64.exe"
   nano_host_32_exe_path: "plugins/tools/Tone2 NanoHost v1.0.2/NanoHost32bit.exe"
   nano_host_64_exe_path: "plugins/tools/Tone2 NanoHost v1.0.2/NanoHost64bit.exe"
 gui:
-  fullscreen: True # False
+  fullscreen: False
   width: 1280
   height: 720
-hydra:
-  run:
-    dir: .
-  output_subdir: null
-  verbose: True # False # This is the Debug Flag
+output: "output_screwed.wav"

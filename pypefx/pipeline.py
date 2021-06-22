@@ -34,13 +34,6 @@ class Pipeline:
                 bar.update(1)
         self.result = _payload
 
-    def save(self):
-        Path("./projects/").mkdir(exist_ok=True)
-        file_path = os.path.join("./projects/", f"{self.name}.yaml")
-        logging.info(f"Saving pipeline: {self.name}")
-        with open(file_path, "w") as f:
-            f.write(dump(self))
-
     def save_steps(self):
         Path("./projects/").mkdir(exist_ok=True)
         file_path = os.path.join("./projects/", f"{self.name}_steps.yaml")
