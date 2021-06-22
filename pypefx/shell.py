@@ -1,3 +1,4 @@
+import logging
 import os
 from cmd import Cmd
 from os import listdir
@@ -11,7 +12,8 @@ from wasabi import msg
 from pypefx._version import __version__
 from pypefx.payload import Payload
 from pypefx.pipeline import Pipeline
-from pypefx.steps import ExportStep
+from pypefx.steps import ExportStep, SoxTempoStep, SoxSpeedStep, SoxBassStep, SoxDitherStep, SoxGainStep, PrintStep, \
+    VstStep, Vst32Step, SoxCombineType, SpleeterStep
 
 
 def is_present(in_file):
@@ -84,14 +86,62 @@ class Shell(Cmd):
 
     def do_add_step(self, line):
         """ Adds a processing step to the pipeline """
-        # TODO
-        pass
+        step_choices = [SoxTempoStep, SoxSpeedStep, SoxBassStep, SoxDitherStep, SoxGainStep, PrintStep, VstStep,
+                        Vst32Step, SoxCombineType, SpleeterStep, ExportStep]
+        step_class = self.ask_indexed(step_choices)
+        step = None
+        if step_class == SoxTempoStep:
+            logging.debug("Chose: Chose: SoxTempoStep")
+            factor = self.ask_int("enter tempo factor")
+            step = SoxTempoStep(factor)
+        elif step_class == SoxSpeedStep:
+            logging.debug("Chose: SoxSpeedStep")
+            factor = self.ask_int("enter tempo factor")
+            step = SoxTempoStep(factor)
+        elif step_class == SoxBassStep:
+            logging.debug("Chose: SoxBassStep")
+            gain_db = self.ask_float_with_default("enter bass gain db", 0)
+            frequency = self.ask_float_with_default("enter bass frequency", 100)
+            slope = self.ask_float_with_default("enter bass slope", 0.5)
+            step = SoxBassStep(gain_db, frequency, slope)
+        elif step_class == SoxDitherStep:
+            logging.debug("Chose: SoxDitherStep")
+            # TODO....
+            step = SoxDitherStep()
+        elif step_class == SoxGainStep:
+            logging.debug("Chose: SoxGainStep")
+        elif step_class == PrintStep:
+            logging.debug("Chose: PrintStep")
+        elif step_class == VstStep:
+            logging.debug("Chose: VstStep")
+        elif step_class == Vst32Step:
+            logging.debug("Chose: Vst32Step")
+        elif step_class == SoxCombineType:
+            logging.debug("Chose: SoxCombineType")
+        elif step_class == SpleeterStep:
+            logging.debug("Chose: SpleeterStep")
+        elif step_class == ExportStep:
+            logging.debug("Chose: ExportStep")
+
+        if step is not None:
+            self.pipeline.add_step(step)
+            return
+
+        msg.error("Something went wrong")
 
     def ask_string(self, prompt):
         return input(f"{prompt}\n : ")
 
     def ask_int(self, dialog: str):
         return int(input(f"{dialog}\n: "))
+
+    def ask_float_with_default(self, dialog: str, default: float):
+        inp = input(f"{dialog} (default: {default})\n : ")
+        if inp is None or inp == "" or inp.strip() == "":
+            choice = default
+        else:
+            choice = float(inp)
+        return choice
 
     def ask_bool(self, dialog: str):
         return "y" in input(f"{dialog} (y/N)\n: ").lower()
