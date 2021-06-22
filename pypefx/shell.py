@@ -54,11 +54,16 @@ class Shell(Cmd):
 
         self.pipeline.save()
 
-    def do_load(self, project_name):
+    def do_load(self, line):
         """ Loads the pipeline from a file """
+        project_name = line
+        if line is None or line == "" or line.strip() == "":
+            project_name = self.ask_file_indexed("./projects/", ".yaml")
+
         project_path = os.path.join("./projects/", f"{project_name}.yaml")
         if Path(project_path).exists():
             with open(project_path, "r") as f:
+                logging.debug(f"loading pipeline: {project_name}")
                 self.pipeline = yaml.load(f)
 
     def do_process(self, in_file):

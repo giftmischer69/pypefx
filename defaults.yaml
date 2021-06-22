@@ -14,4 +14,4 @@ hydra:
   run:
     dir: .
   output_subdir: null
-  verbose: False # True # This is the Debug Flag
+  verbose: True # False # This is the Debug Flag

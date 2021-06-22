@@ -1,6 +1,8 @@
+import logging
 import sys
 
 import hydra
+from hydra.core.hydra_config import HydraConfig
 from omegaconf import DictConfig
 from wasabi import msg
 
@@ -16,7 +18,14 @@ def version() -> str:
 
 @hydra.main(config_path="..", config_name="..\\defaults")
 def hydra_main(cfg: DictConfig) -> None:
+    debug = HydraConfig.get().verbose
+
+    if debug:
+        logging.basicConfig(level=logging.DEBUG)
+        logging.debug(f"debug: {debug}")
+
     pipeline = Pipeline()
+
     # temp
     for i in range(5):
         pipeline.add_step(PrintStep())
