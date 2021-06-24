@@ -98,9 +98,9 @@ class Shell(Cmd):
                 if not is_present(out_file):
                     out_file = self.ask_string("enter file name for output file")
                     if (
-                            not out_file.endswith(".mp3")
-                            or out_file.endswith(".wav")
-                            or out_file.endswith(".flac")
+                        not out_file.endswith(".mp3")
+                        or out_file.endswith(".wav")
+                        or out_file.endswith(".flac")
                     ):
                         out_file += self.ask_indexed([".mp3", ".wav", ".flac"])
 
@@ -178,9 +178,9 @@ class Shell(Cmd):
             logging.debug("Chose: ExportStep")
             out_file = self.ask_string("enter file name for output file")
             if (
-                    not out_file.endswith(".mp3")
-                    or out_file.endswith(".wav")
-                    or out_file.endswith(".flac")
+                not out_file.endswith(".mp3")
+                or out_file.endswith(".wav")
+                or out_file.endswith(".flac")
             ):
                 out_file += self.ask_indexed([".mp3", ".wav", ".flac"])
             step = ExportStep(out_file)

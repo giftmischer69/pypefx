@@ -10,8 +10,17 @@ from pypefx._version import __version__
 from pypefx.gui import Gui
 from pypefx.pipeline import Pipeline
 from pypefx.shell import Shell
-from pypefx.steps import PrintStep, ExportStep, SoxDitherStep, SoxSpeedStep, SoxGainStep, SoxBassStep, VstStep, \
-    SpleeterStep, SoxCombineType
+from pypefx.steps import (
+    PrintStep,
+    ExportStep,
+    SoxDitherStep,
+    SoxSpeedStep,
+    SoxGainStep,
+    SoxBassStep,
+    VstStep,
+    SpleeterStep,
+    SoxCombineType,
+)
 
 
 def version() -> str:
@@ -93,7 +102,9 @@ def hydra_main(cfg: DictConfig) -> None:
         if inp is not None and profile is not None:
             s = Shell(pipeline, cfg)
             s.do_load(profile)
-            if out is not None and not any(isinstance(x, ExportStep) for x in s.pipeline.steps):
+            if out is not None and not any(
+                    isinstance(x, ExportStep) for x in s.pipeline.steps
+            ):
                 s.pipeline.add_step(ExportStep(out))
             s.do_process(inp)
         goodbye()
@@ -106,8 +117,6 @@ def hydra_main(cfg: DictConfig) -> None:
     elif "gui" == mode:
         g = Gui(pipeline=pipeline, cfg=cfg)
         g.run()
-        # TODO
-        msg.warn("not implemented yet")
         goodbye()
         return
 
