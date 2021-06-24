@@ -7,6 +7,7 @@ from omegaconf import DictConfig
 from wasabi import msg
 
 from pypefx._version import __version__
+from pypefx.gui import Gui
 from pypefx.pipeline import Pipeline
 from pypefx.shell import Shell
 from pypefx.steps import PrintStep, ExportStep, SoxDitherStep, SoxSpeedStep, SoxGainStep, SoxBassStep, VstStep, \
@@ -70,6 +71,9 @@ def hydra_main(cfg: DictConfig) -> None:
 
     pipeline = Pipeline()
 
+    # TODO REMOVE (TEMP)
+    pipeline = temp_debug_sound(pipeline)
+
     mode = cfg.get("mode", None)
     logging.debug(f"mode: {mode}")
     if mode is None:
@@ -95,12 +99,13 @@ def hydra_main(cfg: DictConfig) -> None:
         goodbye()
         return
     elif "shell" == mode:
-        pipeline = temp_debug_sound(pipeline)
         s = Shell(pipeline=pipeline, cfg=cfg)
         s.cmdloop()
         goodbye()
         return
     elif "gui" == mode:
+        g = Gui(pipeline=pipeline, cfg=cfg)
+        g.run()
         # TODO
         msg.warn("not implemented yet")
         goodbye()

@@ -1,4 +1,4 @@
-mode: cli # shell # TODO: gui
+mode: gui # cli # shell
 user_name: anon
 hydra:
   run:
