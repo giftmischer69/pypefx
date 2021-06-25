@@ -65,6 +65,7 @@ def temp_debug_sound(pipeline):
 
     # pipeline.add_step(SoxGainStep(0, False, True))
     pipeline.add_step(SoxSpeedStep(0.84))
+
     pipeline.add_step(SoxDitherStep())
     pipeline.add_step(ExportStep("debug_audio.wav"))
     return pipeline
@@ -90,23 +91,29 @@ def hydra_main(cfg: DictConfig) -> None:
         goodbye()
         return
     elif "cli" == mode:
+        s = Shell(pipeline, cfg)
+
         inp = cfg.get("input", None)
         logging.debug(f"inp: {inp}")
+        if inp is None:
+            msg.info("Choose Input File extension")
+            ext = s.ask_indexed([".mp3", ".wav", ".flac"])
+            inp = s.ask_file_indexed(".", ext)
 
         out = cfg.get("output", None)
         logging.debug(f"output: {out}")
-
-        profile = cfg.get("profile", None)
-        logging.debug(f"profile: {profile}")
-
-        if inp is not None and profile is not None:
-            s = Shell(pipeline, cfg)
-            s.do_load(profile)
-            if out is not None and not any(
+        if out is None:
+            out = s.ask_string("enter output file name")
+            if not any(
                     isinstance(x, ExportStep) for x in s.pipeline.steps
             ):
                 s.pipeline.add_step(ExportStep(out))
-            s.do_process(inp)
+
+        profile = cfg.get("profile", None)
+        logging.debug(f"profile: {profile}")
+        s.do_load(profile)
+
+        s.do_process(inp)
         goodbye()
         return
     elif "shell" == mode:

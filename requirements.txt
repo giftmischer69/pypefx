@@ -1,5 +1,4 @@
 wasabi~=0.8.2
-spleeter
 dearpygui~=0.6.415
 sox~=1.4.1
 numpy~=1.18.5
@@ -8,4 +7,5 @@ omegaconf~=2.1.0
 pyyaml~=5.4.1
 future~=0.18.2
 hydra-core
-watchgod
+# spleeter
+# matchering

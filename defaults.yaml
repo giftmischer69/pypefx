@@ -1,4 +1,4 @@
-mode: gui # cli # shell
+mode: shell # cli # gui # cli # shell
 user_name: anon
 hydra:
   run:
@@ -14,4 +14,4 @@ gui:
   fullscreen: False
   width: 1280
   height: 720
-output: "output_screwed.wav"
+output: "output_screwed"
