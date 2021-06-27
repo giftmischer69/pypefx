@@ -7,7 +7,7 @@ from omegaconf import DictConfig
 from wasabi import msg
 
 from pypefx._version import __version__
-from pypefx.gui import Gui
+# from pypefx.gui import Gui
 from pypefx.pipeline import Pipeline
 from pypefx.shell import Shell
 from pypefx.steps import (
@@ -85,6 +85,7 @@ def hydra_main(cfg: DictConfig) -> None:
     pipeline = temp_debug_sound(pipeline)
 
     mode = cfg.get("mode", None)
+    mode = "shell"
     logging.debug(f"mode: {mode}")
     if mode is None:
         msg.warn("pypefx mode is None -> exit")
@@ -122,8 +123,8 @@ def hydra_main(cfg: DictConfig) -> None:
         goodbye()
         return
     elif "gui" == mode:
-        g = Gui(pipeline=pipeline, cfg=cfg)
-        g.run()
+        # g = Gui(pipeline=pipeline, cfg=cfg)
+        # g.run()
         goodbye()
         return
 
