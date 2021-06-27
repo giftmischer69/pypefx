@@ -1,12 +1,17 @@
 import argparse
+import os
 import sys
 from pathlib import Path
 
+from pypefx.shell import Shell
+
+from pypefx.pipeline import Pipeline
 from wasabi import msg
 
 from pypefx._version import __version__
 
 import sox
+
 
 def version() -> str:
     return f"pypefx {__version__}"
@@ -15,6 +20,9 @@ def version() -> str:
 def goodbye() -> None:
     msg.good("Goodbye :)")
 
+
+# TODO: https://docs.python.org/3/library/configparser.html
+# TODO ./defaults.ini
 
 def debug_main():
     parser = argparse.ArgumentParser()
@@ -25,6 +33,11 @@ def debug_main():
 
     msg.good("HELLO WORLD!")
     msg.info(args)
+    msg.info(os.getcwd())
+
+    p = Pipeline()
+    s = Shell(p, None)
+    s.cmdloop()
 
 
 def main():
