@@ -53,27 +53,31 @@ def main():
     p = Pipeline()
     s = Shell(p)
 
+    if args.input:
+        input_file = args.input
+
     if args.profile:
         s.do_load(args.profile)
-    elif args.mode == Mode.CLI.name:
-        profile = s.ask_file_indexed("./projects", ".yaml")
-        s.do_load(profile)
 
     if args.output:
         output_file = args.output
-    elif args.mode == Mode.CLI.name and not any(
-            isinstance(x, ExportStep) for x in s.pipeline.steps
-    ):
-        output_file = s.ask_string("enter output file name")
-        s.pipeline.add_step(ExportStep(output_file))
 
     if args.mode == Mode.CLI.name:
-        if args.input:
-            input_file = args.input
-        else:
+        if not args.profile:
+            profile = s.ask_file_indexed("./projects", ".yaml")
+            s.do_load(profile)
+
+        if not input_file:
             msg.info("Choose Input File extension")
             ext = s.ask_indexed([".mp3", ".wav", ".flac"])
             input_file = s.ask_file_indexed(".", ext)
+
+        if not output_file and not any(
+                isinstance(x, ExportStep) for x in s.pipeline.steps
+        ):
+            output_file = s.ask_string("enter output file name")
+            s.pipeline.add_step(ExportStep(output_file))
+
         s.do_process(input_file)
     elif args.mode == Mode.SHELL.name:
         s.cmdloop()
