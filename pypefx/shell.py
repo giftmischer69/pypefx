@@ -100,15 +100,12 @@ class Shell(Cmd):
                     out_file = self.ask_string("enter file name for output file")
                     if (
                             not out_file.endswith(".mp3")
-                            or out_file.endswith(".wav")
-                            or out_file.endswith(".flac")
+                            or not out_file.endswith(".wav")
+                            or not out_file.endswith(".flac")
                     ):
                         out_file += self.ask_indexed([".mp3", ".wav", ".flac"])
 
                 self.pipeline.add_step(ExportStep(out_file))
-
-        if not is_present(in_file):
-            in_file = self.input_file
 
         if not is_present(in_file):
             in_file = self.ask_file_indexed(".", ".mp3")
