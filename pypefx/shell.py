@@ -32,11 +32,12 @@ def is_present(in_file):
 
 
 class Shell(Cmd):
-    def __init__(self, pipeline: Pipeline, cfg: DictConfig):
+    def __init__(self, pipeline: Pipeline, output_file: str = None):
         super().__init__()
         self.prompt = "fxsh> "
-        self.cfg = cfg
         self.pipeline = pipeline
+        if output_file:
+            self.output_file = output_file
 
     def preloop(self) -> None:
         msg.good(f"Hello from pyepfx Version: {__version__}")
@@ -94,20 +95,20 @@ class Shell(Cmd):
         # https://stackoverflow.com/a/32705845
         if not any(isinstance(x, ExportStep) for x in self.pipeline.steps):
             if self.ask_bool("do you want to export the result?"):
-                out_file = self.cfg.get("output", None)
+                out_file = self.output_file
                 if not is_present(out_file):
                     out_file = self.ask_string("enter file name for output file")
                     if (
-                        not out_file.endswith(".mp3")
-                        or out_file.endswith(".wav")
-                        or out_file.endswith(".flac")
+                            not out_file.endswith(".mp3")
+                            or out_file.endswith(".wav")
+                            or out_file.endswith(".flac")
                     ):
                         out_file += self.ask_indexed([".mp3", ".wav", ".flac"])
 
                 self.pipeline.add_step(ExportStep(out_file))
 
         if not is_present(in_file):
-            in_file = self.cfg.get("input", None)
+            in_file = self.input_file
 
         if not is_present(in_file):
             in_file = self.ask_file_indexed(".", ".mp3")
@@ -178,9 +179,9 @@ class Shell(Cmd):
             logging.debug("Chose: ExportStep")
             out_file = self.ask_string("enter file name for output file")
             if (
-                not out_file.endswith(".mp3")
-                or out_file.endswith(".wav")
-                or out_file.endswith(".flac")
+                    not out_file.endswith(".mp3")
+                    or out_file.endswith(".wav")
+                    or out_file.endswith(".flac")
             ):
                 out_file += self.ask_indexed([".mp3", ".wav", ".flac"])
             step = ExportStep(out_file)

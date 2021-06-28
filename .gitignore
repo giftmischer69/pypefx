@@ -9,6 +9,7 @@ projects
 build
 dist
 __main__.spec
+*.zip
 
 # Spleeter
 pretrained_models
