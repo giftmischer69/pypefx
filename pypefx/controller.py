@@ -53,14 +53,17 @@ def main():
     p = Pipeline()
     s = Shell(p)
 
+    input_file = None
     if args.input:
         input_file = args.input
 
     if args.profile:
         s.do_load(args.profile)
 
+    output_file = None
     if args.output:
         output_file = args.output
+        s.pipeline.add_step(ExportStep(output_file))
 
     if args.mode == Mode.CLI.name:
         if not args.profile:

@@ -5,21 +5,28 @@ apply an effects pipeline to a song.
 ## Usage:
 
 ````shell
-# cli usage: 
-python -m pypefx
+# every command can be run with 
+# either: python -m pypefx [args]
+# or:     pypefx [args]
 
-python -m pypefx ++mode=cli +input="song.mp3" +profile=profile_name 
+# cli usage: 
+pypefx
+
+pypefx --help
+
+pypefx --version
+
+pypefx -i song.mp3 -p profile_name -o output.wav 
 
 # shell usage:
-python -m pypefx ++mode=shell  
-
-python -m pypefx +input="song.mp3" ++output="output.wav"
+pypefx -m SHELL  
 
 # gui usage:
-python -m pypefx ++mode=gui
+pypefx -m GUI
 
 # enabling debug logging:
-python -m pypefx hydra.verbose=True
+pypefx -d [args]
+pypefx --debug [args]
 ````
 
 <hr>
@@ -27,32 +34,25 @@ python -m pypefx hydra.verbose=True
 ## How it works:
 
 ````text
-┌─────┐                                             
-│input│                                             
-└┬────┘                                             
-┌▽─────────────────────┐                            
-│optional_input_effects│                            
-└┬─────────────────────┘                            
-┌▽─────────────────────────────┐                    
-│spleeter                      │                    
-└┬────────┬────────┬──────────┬┘                    
-┌▽──────┐┌▽──────┐┌▽────────┐┌▽──────────┐          
-│track_4││track_2││track_3  ││track_1    │          
-└┬──────┘└────┬──┘└────────┬┘└──────────┬┘          
-┌▽──────────┐┌▽──────────┐┌▽──────────┐┌▽──────────┐
-│effect_4...││effect_2...││effect_3...││effect_1...│
-└┬──────────┘└┬──────────┘└┬──────────┘└┬──────────┘
-┌▽────────────▽────────────▽────────────▽┐          
-│combiner                                │          
-└┬───────────────────────────────────────┘          
-┌▽──────────────────────┐                           
-│optional_output_effects│                           
-└┬──────────────────────┘                           
-┌▽─────┐                                            
-│output│                                            
-└──────┘    
+┌──────────┐             
+│input_file│             
+└┬─────────┘             
+┌▽───────┐               
+│effect_1│               
+└┬───────┘               
+┌▽───────┐               
+│effect_2│               
+└┬───────┘               
+┌▽──┐                    
+│...│                    
+└┬──┘                    
+┌▽───────┐               
+│effect_N│               
+└┬───────┘               
+┌▽──────────────────────┐
+│ExportStep(output_file)│
+└───────────────────────┘
 ````
-
 [diagram source](https://arthursonzogni.com/Diagon/#GraphDAG)
 
 ## VST Effects Source
@@ -66,6 +66,6 @@ http://vstplanet.com/Effects/Effects.htm
     - node-based gui internals
     - add tests
 - infrastructure
-    - add setup.py
-    - add building exe
+    - [X] add setup.py
+    - [X] add building exe
     - add pybuilder  
