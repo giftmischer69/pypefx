@@ -1,6 +1,7 @@
 import logging
 import os
 from cmd import Cmd
+from glob import glob
 from os import listdir
 from os.path import join, isfile
 from pathlib import Path
@@ -54,10 +55,20 @@ class Shell(Cmd):
 
     def do_display(self, line):
         """ Displays the current pipeline configuration """
-        # TODO display spleeter step etc
         msg.info(f"Display pipeline: {self.pipeline.name}")
         for step in self.pipeline.steps:
-            msg.info(f"\t{type(step).__name__}")
+            if type(step) == SpleeterStep:
+                for stp in step.vocal_steps:
+                    msg.info(f"\tvocal_step: {type(stp).__name__}")
+                for stp in step.bass_steps:
+                    msg.info(f"\tbass_step: {type(stp).__name__}")
+                for stp in step.other_steps:
+                    msg.info(f"\tother_step: {type(stp).__name__}")
+                for stp in step.drum_steps:
+                    msg.info(f"\tdrum_step: {type(stp).__name__}")
+                msg.info(f"\tdrum_step: {step.combine_type}")
+            else:
+                msg.info(f"\t{type(step).__name__}")
 
     def do_save(self, line):
         """ Saves the current pipeline to a file """
@@ -97,11 +108,12 @@ class Shell(Cmd):
             if self.ask_bool("do you want to export the result?"):
                 out_file = self.output_file
                 if not is_present(out_file):
-                    out_file = self.ask_string("enter file name for output file")
+                    out_file = self.ask_string("enter file name for output file (remember .wav or .mp3 extension)")
+
                     if (
                             not out_file.endswith(".mp3")
-                            or not out_file.endswith(".wav")
-                            or not out_file.endswith(".flac")
+                            and not out_file.endswith(".wav")
+                            and not out_file.endswith(".flac")
                     ):
                         out_file += self.ask_indexed([".mp3", ".wav", ".flac"])
 
@@ -124,11 +136,10 @@ class Shell(Cmd):
             PrintStep,
             VstStep,
             Vst32Step,
-            SoxCombineType,
             SpleeterStep,
             ExportStep,
         ]
-        step_class = self.ask_indexed(step_choices)
+        step_class = self.ask_step_indexed(step_choices)
         step = None
         if step_class == SoxTempoStep:
             logging.debug("Chose: Chose: SoxTempoStep")
@@ -158,16 +169,16 @@ class Shell(Cmd):
             step = PrintStep()
         elif step_class == VstStep:
             logging.debug("Chose: VstStep")
-            # TODO
-            print("not implemented yet :)")
+            plugin_path = Path("./plugins/effects/64bit").absolute()
+            dll = self.ask_file_recursive_indexed(plugin_path, ".dll")
+            fxp = self.ask_file_recursive_indexed(plugin_path, ".fxp")
+            step = VstStep(dll, fxp)
         elif step_class == Vst32Step:
             logging.debug("Chose: Vst32Step")
-            # TODO
-            print("not implemented yet :)")
-        elif step_class == SoxCombineType:
-            logging.debug("Chose: SoxCombineType")
-            # TODO
-            print("not implemented yet :)")
+            plugin_path = Path("./plugins/effects/32bit").absolute()
+            dll = self.ask_file_recursive_indexed(plugin_path, ".dll")
+            fxp = self.ask_file_recursive_indexed(plugin_path, ".fxp")
+            step = Vst32Step(dll, fxp)
         elif step_class == SpleeterStep:
             logging.debug("Chose: SpleeterStep")
             # TODO
@@ -177,12 +188,11 @@ class Shell(Cmd):
             out_file = self.ask_string("enter file name for output file")
             if (
                     not out_file.endswith(".mp3")
-                    or out_file.endswith(".wav")
-                    or out_file.endswith(".flac")
+                    and not out_file.endswith(".wav")
+                    and not out_file.endswith(".flac")
             ):
                 out_file += self.ask_indexed([".mp3", ".wav", ".flac"])
             step = ExportStep(out_file)
-            pass
 
         if step is not None:
             self.pipeline.add_step(step)
@@ -208,6 +218,7 @@ class Shell(Cmd):
         return "y" in input(f"{dialog} (y/N)\n: ").lower()
 
     def ask_file_indexed(self, initial_folder, ext):
+        logging.debug(f"initial_folder: {initial_folder}")
         if not initial_folder:
             initial_folder = os.getcwd()
 
@@ -216,10 +227,32 @@ class Shell(Cmd):
             for f in listdir(initial_folder)
             if (isfile(join(initial_folder, f)) and f.lower().endswith(ext))
         ]
+        logging.debug(f"FILES: {only_files}")
         return self.ask_indexed(only_files)
+
+    def ask_file_recursive_indexed(self, initial_folder, ext):
+        logging.debug(f"initial_folder: {initial_folder}")
+        if not initial_folder:
+            initial_folder = os.getcwd()
+
+        only_files = [y for x in os.walk(initial_folder) for y in glob(os.path.join(x[0], f'*{ext}'))]
+        logging.debug(f"FILES: {only_files}")
+        return self.ask_file_name_indexed(only_files)
 
     def ask_indexed(self, options_list):
         for index, option in enumerate(options_list):
             print(f"({index})".ljust(5, " "), " ", option)
         choice = self.ask_int("enter option number (0-n)")
         return options_list[choice]
+
+    def ask_step_indexed(self, steps_list):
+        for index, option in enumerate(steps_list):
+            print(f"({index})".ljust(5, " "), " ", option.__name__)
+        choice = self.ask_int("enter option number (0-n)")
+        return steps_list[choice]
+
+    def ask_file_name_indexed(self, steps_list):
+        for index, option in enumerate(steps_list):
+            print(f"({index})".ljust(5, " "), " ", Path(option).name)
+        choice = self.ask_int("enter option number (0-n)")
+        return steps_list[choice]

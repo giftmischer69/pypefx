@@ -81,9 +81,6 @@ def hydra_main(cfg: DictConfig) -> None:
 
     pipeline = Pipeline()
 
-    # TODO REMOVE (TEMP)
-    pipeline = temp_debug_sound(pipeline)
-
     mode = cfg.get("mode", None)
     mode = "shell"
     logging.debug(f"mode: {mode}")

@@ -63,9 +63,13 @@ http://vstplanet.com/Effects/Effects.htm
 
 - code
     - add youtube url support as input
-    - node-based gui internals
+    - Shell full step support
+    - Gui 
+      - node-based gui internals
     - add tests
+    - add folder as input
 - infrastructure
     - [X] add setup.py
     - [X] add building exe
     - add pybuilder  
+    - add asciicinema gif in readme
