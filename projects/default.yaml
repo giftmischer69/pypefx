@@ -1,0 +1,7 @@
+!!python/object:pypefx.pipeline.Pipeline
+name: default
+result: !!python/object:pypefx.payload.Payload
+  message: null
+  sample_rate: 44100
+steps:
+- !!python/object:pypefx.steps.PrintStep {}

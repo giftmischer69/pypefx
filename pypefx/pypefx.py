@@ -7,6 +7,7 @@ from omegaconf import DictConfig
 from wasabi import msg
 
 from pypefx._version import __version__
+
 # from pypefx.gui import Gui
 from pypefx.pipeline import Pipeline
 from pypefx.shell import Shell
@@ -102,9 +103,7 @@ def hydra_main(cfg: DictConfig) -> None:
         logging.debug(f"output: {out}")
         if out is None:
             out = s.ask_string("enter output file name")
-            if not any(
-                    isinstance(x, ExportStep) for x in s.pipeline.steps
-            ):
+            if not any(isinstance(x, ExportStep) for x in s.pipeline.steps):
                 s.pipeline.add_step(ExportStep(out))
 
         profile = cfg.get("profile", None)

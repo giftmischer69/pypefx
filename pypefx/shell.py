@@ -5,9 +5,10 @@ from glob import glob
 from os import listdir
 from os.path import join, isfile
 from pathlib import Path
+from typing import List
 
 import yaml
-from omegaconf import DictConfig
+from numpy.core.defchararray import isnumeric
 from wasabi import msg
 
 from pypefx._version import __version__
@@ -25,6 +26,7 @@ from pypefx.steps import (
     Vst32Step,
     SoxCombineType,
     SpleeterStep,
+    Step,
 )
 
 
@@ -33,12 +35,10 @@ def is_present(in_file):
 
 
 class Shell(Cmd):
-    def __init__(self, pipeline: Pipeline, output_file: str = None):
+    def __init__(self, pipeline: Pipeline):
         super().__init__()
         self.prompt = "fxsh> "
         self.pipeline = pipeline
-        if output_file:
-            self.output_file = output_file
 
     def preloop(self) -> None:
         msg.good(f"Hello from pyepfx Version: {__version__}")
@@ -57,18 +57,17 @@ class Shell(Cmd):
         """ Displays the current pipeline configuration """
         msg.info(f"Display pipeline: {self.pipeline.name}")
         for step in self.pipeline.steps:
+            msg.info(f"\t{type(step).__name__}")
             if type(step) == SpleeterStep:
                 for stp in step.vocal_steps:
-                    msg.info(f"\tvocal_step: {type(stp).__name__}")
+                    msg.info(f"\t\tvocal_step: {type(stp).__name__}")
                 for stp in step.bass_steps:
-                    msg.info(f"\tbass_step: {type(stp).__name__}")
+                    msg.info(f"\t\tbass_step: {type(stp).__name__}")
                 for stp in step.other_steps:
-                    msg.info(f"\tother_step: {type(stp).__name__}")
+                    msg.info(f"\t\tother_step: {type(stp).__name__}")
                 for stp in step.drum_steps:
-                    msg.info(f"\tdrum_step: {type(stp).__name__}")
-                msg.info(f"\tdrum_step: {step.combine_type}")
-            else:
-                msg.info(f"\t{type(step).__name__}")
+                    msg.info(f"\t\tdrum_step: {type(stp).__name__}")
+                msg.info(f"\t\tcombine_type: {step.combine_type}")
 
     def do_save(self, line):
         """ Saves the current pipeline to a file """
@@ -106,16 +105,16 @@ class Shell(Cmd):
         # https://stackoverflow.com/a/32705845
         if not any(isinstance(x, ExportStep) for x in self.pipeline.steps):
             if self.ask_bool("do you want to export the result?"):
-                out_file = self.output_file
-                if not is_present(out_file):
-                    out_file = self.ask_string("enter file name for output file (remember .wav or .mp3 extension)")
+                out_file = self.ask_string(
+                    "enter file name for output file (remember .wav or .mp3 extension)"
+                )
 
-                    if (
-                            not out_file.endswith(".mp3")
-                            and not out_file.endswith(".wav")
-                            and not out_file.endswith(".flac")
-                    ):
-                        out_file += self.ask_indexed([".mp3", ".wav", ".flac"])
+                if (
+                        not out_file.endswith(".mp3")
+                        and not out_file.endswith(".wav")
+                        and not out_file.endswith(".flac")
+                ):
+                    out_file += self.ask_indexed([".mp3", ".wav", ".flac"])
 
                 self.pipeline.add_step(ExportStep(out_file))
 
@@ -181,8 +180,28 @@ class Shell(Cmd):
             step = Vst32Step(dll, fxp)
         elif step_class == SpleeterStep:
             logging.debug("Chose: SpleeterStep")
-            # TODO
-            print("not implemented yet :)")
+            bass_steps = self.ask_steps_loop(
+                "add processing steps for the bass part of the song"
+            )
+            drum_steps = self.ask_steps_loop(
+                "add processing steps for the drums of the song"
+            )
+            vocal_steps = self.ask_steps_loop(
+                "add processing steps for the vocals of the song"
+            )
+            other_steps = self.ask_steps_loop(
+                "add processing steps for other parts of the song"
+            )
+            combine_types = [SoxCombineType.MERGE, SoxCombineType.MIX, SoxCombineType.CONCATENATE,
+                             SoxCombineType.SEQUENCE]
+            msg.info("Choose combine type: ")
+            combine_type = self.ask_indexed(combine_types)
+            # bass steps
+            # drum steps
+            # vocal steps
+            # other steps
+            # combine_type
+            step = SpleeterStep(bass_steps, drum_steps, vocal_steps, other_steps, combine_type)
         elif step_class == ExportStep:
             logging.debug("Chose: ExportStep")
             out_file = self.ask_string("enter file name for output file")
@@ -199,6 +218,17 @@ class Shell(Cmd):
             return
 
         msg.error("Something went wrong")
+
+    def do_remove(self, line):
+        # TODO add feature: remove step
+        pass
+
+    # TODO add feature: memento pattern (with decorator) / undo / redo
+    def do_undo(self, line):
+        pass
+
+    def do_redo(self, line):
+        pass
 
     def ask_string(self, prompt):
         return input(f"{prompt}\n : ")
@@ -235,7 +265,11 @@ class Shell(Cmd):
         if not initial_folder:
             initial_folder = os.getcwd()
 
-        only_files = [y for x in os.walk(initial_folder) for y in glob(os.path.join(x[0], f'*{ext}'))]
+        only_files = [
+            y
+            for x in os.walk(initial_folder)
+            for y in glob(os.path.join(x[0], f"*{ext}"))
+        ]
         logging.debug(f"FILES: {only_files}")
         return self.ask_file_name_indexed(only_files)
 
@@ -256,3 +290,65 @@ class Shell(Cmd):
             print(f"({index})".ljust(5, " "), " ", Path(option).name)
         choice = self.ask_int("enter option number (0-n)")
         return steps_list[choice]
+
+    def ask_steps_loop(self, prompt) -> List[Step]:
+        step_choices = [
+            SoxBassStep,
+            SoxDitherStep,
+            SoxGainStep,
+            PrintStep,
+            VstStep,
+            Vst32Step,
+            ExportStep,
+        ]
+        inp = ""
+        steps = []
+        msg.info(prompt)
+        while "q" not in inp:
+            for index, option in enumerate(step_choices):
+                print(f"({index})".ljust(5, " "), " ", option.__name__)
+            inp = input("Choose Step (0-n)! (q to quit choosing steps)\n: ")
+            if isnumeric(inp):
+                choice = step_choices[int(inp)]
+                if choice == SoxBassStep:
+                    logging.debug("Chose: SoxBassStep")
+                    gain_db = self.ask_float_with_default("enter bass gain db", 0)
+                    frequency = self.ask_float_with_default("enter bass frequency", 100)
+                    slope = self.ask_float_with_default("enter bass slope", 0.5)
+                    steps.append(SoxBassStep(gain_db, frequency, slope))
+                elif choice == SoxDitherStep:
+                    logging.debug("Chose: SoxDitherStep")
+                    steps.append(SoxDitherStep())
+                elif choice == SoxGainStep:
+                    logging.debug("Chose: SoxGainStep")
+                    gain_db = self.ask_float_with_default("enter gain db", 0)
+                    normalize = self.ask_bool("normalize audio?")
+                    limiter = self.ask_bool("use limiter?")
+                    steps.append(SoxGainStep(gain_db, normalize, limiter))
+                elif choice == PrintStep:
+                    logging.debug("Chose: PrintStep")
+                    steps.append(PrintStep())
+                elif choice == VstStep:
+                    logging.debug("Chose: VstStep")
+                    plugin_path = Path("./plugins/effects/64bit").absolute()
+                    dll = self.ask_file_recursive_indexed(plugin_path, ".dll")
+                    fxp = self.ask_file_recursive_indexed(plugin_path, ".fxp")
+                    steps.append(VstStep(dll, fxp))
+                elif choice == Vst32Step:
+                    logging.debug("Chose: Vst32Step")
+                    plugin_path = Path("./plugins/effects/32bit").absolute()
+                    dll = self.ask_file_recursive_indexed(plugin_path, ".dll")
+                    fxp = self.ask_file_recursive_indexed(plugin_path, ".fxp")
+                    steps.append(Vst32Step(dll, fxp))
+                elif choice == ExportStep:
+                    logging.debug("Chose: ExportStep")
+                    out_file = self.ask_string("enter file name for output file")
+                    if (
+                            not out_file.endswith(".mp3")
+                            and not out_file.endswith(".wav")
+                            and not out_file.endswith(".flac")
+                    ):
+                        out_file += self.ask_indexed([".mp3", ".wav", ".flac"])
+                    steps.append(ExportStep(out_file))
+
+        return steps

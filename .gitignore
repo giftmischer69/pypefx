@@ -3,7 +3,7 @@ ____pypefx
 output
 
 # pypefx projects
-projects
+# projects
 
 # dist & build for pyinstaller
 build

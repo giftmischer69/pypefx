@@ -4,6 +4,7 @@ channels:
   - groakat
 dependencies:
   - python=3.8
+  - rust
   - ffmpeg
   - sox
   - libsndfile

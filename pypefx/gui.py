@@ -59,7 +59,7 @@ class StepNode(Node):
                 max_value=2,
                 default_value=self.step.factor,
                 label="factor",
-                no_input=True  # TODO Temp
+                no_input=True,  # TODO Temp
             )
         elif step_class == SoxSpeedStep:
             logging.debug("Chose: SoxSpeedStep")
@@ -70,7 +70,7 @@ class StepNode(Node):
                 default_value=self.step.factor,
                 width=150,
                 label="factor",
-                no_input=True  # TODO Temp
+                no_input=True,  # TODO Temp
             )
         elif step_class == SoxBassStep:
             logging.debug("Chose: SoxBassStep")
@@ -81,7 +81,7 @@ class StepNode(Node):
                 default_value=self.step.gain_db,
                 width=150,
                 label="gain_db",
-                no_input=True  # TODO Temp
+                no_input=True,  # TODO Temp
             )
             add_slider_float(
                 self.name + "_frequency",
@@ -90,7 +90,7 @@ class StepNode(Node):
                 default_value=self.step.frequency,
                 width=150,
                 label="frequency",
-                no_input=True  # TODO Temp
+                no_input=True,  # TODO Temp
             )
             add_slider_float(
                 self.name + "_slope",
@@ -99,7 +99,7 @@ class StepNode(Node):
                 default_value=self.step.slope,
                 width=150,
                 label="slope",
-                no_input=True  # TODO Temp
+                no_input=True,  # TODO Temp
             )
         elif step_class == SoxDitherStep:
             logging.debug("Chose: SoxDitherStep")
@@ -112,10 +112,16 @@ class StepNode(Node):
                 default_value=self.step.gain_db,
                 width=150,
                 label="gain_db",
-                no_input=True  # TODO Temp
+                no_input=True,  # TODO Temp
             )
-            add_checkbox(self.name + "_normalize", default_value=self.step.normalize, label="normalize")
-            add_checkbox(self.name + "_limiter", default_value=self.step.limiter, label="limiter")
+            add_checkbox(
+                self.name + "_normalize",
+                default_value=self.step.normalize,
+                label="normalize",
+            )
+            add_checkbox(
+                self.name + "_limiter", default_value=self.step.limiter, label="limiter"
+            )
         elif step_class == PrintStep:
             logging.debug("Chose: PrintStep")
         elif step_class == VstStep:

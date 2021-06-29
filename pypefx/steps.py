@@ -197,14 +197,21 @@ class SoxCombineType(Enum):
     MERGE = "merge"
 
 
+def debug_export(__p: Payload, file_name: str):
+    Path("./debug").mkdir(exist_ok=True)
+    __out_file = Path(f"./debug/{file_name}").absolute().__str__()
+    TransformerSingleton.instance().build(input_array=__p.message, sample_rate_in=__p.sample_rate,
+                                          output_filepath=__out_file)
+
+
 class SpleeterStep(Step):
     def __init__(
-        self,
-        bass_steps: List[Step],
-        drum_steps: List[Step],
-        vocal_steps: List[Step],
-        other_steps: List[Step],
-        combine_type: SoxCombineType,
+            self,
+            bass_steps: List[Step],
+            drum_steps: List[Step],
+            vocal_steps: List[Step],
+            other_steps: List[Step],
+            combine_type: SoxCombineType,
     ):
         self.combine_type = combine_type
         self.other_steps = other_steps
@@ -226,7 +233,6 @@ class SpleeterStep(Step):
         )
         CommandRunner.run_checked(spleeter_command)
 
-        # TODO Further
         project_path = Path(temp_dir_name).absolute()
         project_files = [
             y for x in os.walk(project_path) for y in glob(os.path.join(x[0], "*.wav"))
@@ -237,10 +243,10 @@ class SpleeterStep(Step):
         temp_other_payload = Payload()
 
         for (
-            file
+                file
         ) in (
-            project_files
-        ):  # TODO Process split files File Based like @ "D:\genos.se\effectsrack\squash.py"
+                project_files
+        ):
             logging.debug(f"processing split file: {file}")
             if "vocals" in file:
                 temp_vocal_payload.message = (
@@ -249,9 +255,11 @@ class SpleeterStep(Step):
                         sample_rate_in=temp_vocal_payload.sample_rate,
                     )
                 )
+                # debug_export(temp_vocal_payload, "temp_vocal_payload_b4.wav")
                 for step in self.vocal_steps:
                     logging.debug(f"doing step:{type(step)} for file {file}")
                     temp_vocal_payload = step.process(temp_vocal_payload)
+                # debug_export(temp_vocal_payload, "temp_vocal_payload_after.wav")
             elif "drums" in file:
                 temp_drum_payload.message = TransformerSingleton.instance().build_array(
                     input_filepath=file, sample_rate_in=temp_drum_payload.sample_rate
@@ -286,10 +294,11 @@ class SpleeterStep(Step):
         temp_file_names = []
         for payload in temp_payloads:
             temp_name = (
-                "".join(random.choice(string.ascii_lowercase) for i in range(8))
-                + ".wav"
+                    "".join(random.choice(string.ascii_lowercase) for i in range(8))
+                    + ".wav"
             )
             temp_file_names.append(temp_name)
+            # debug_export(payload, temp_name)
             TransformerSingleton.instance().build(
                 input_array=payload.message,
                 sample_rate_in=payload.sample_rate,
@@ -297,9 +306,9 @@ class SpleeterStep(Step):
             )
 
         combined_file_name = (
-            "combined_"
-            + "".join(random.choice(string.ascii_lowercase) for i in range(8))
-            + ".wav"
+                "combined_"
+                + "".join(random.choice(string.ascii_lowercase) for i in range(8))
+                + ".wav"
         )
 
         mix_mode = self.combine_type.name
@@ -308,15 +317,20 @@ class SpleeterStep(Step):
             logging.debug(mix_mode)
 
         try:
-            sox.Combiner().build(
-                input_filepath_list=temp_file_names,
-                output_filepath=combined_file_name,
-                combine_type=mix_mode,
-            )
-
+            # sox.Combiner().build(
+            #     input_filepath_list=temp_file_names,
+            #     output_filepath=combined_file_name,
+            #     combine_type=mix_mode,
+            # )
+            cbn_cmd = f"sox --combine {mix_mode}"
+            for file_name in temp_file_names:
+                cbn_cmd += f" {file_name}"
+            cbn_cmd += f" {combined_file_name}"
+            CommandRunner.run_checked(cbn_cmd)
             p.message = TransformerSingleton.instance().build_array(
                 input_filepath=combined_file_name, sample_rate_in=p.sample_rate
             )
+            # debug_export(p, "combined.wav")
         finally:
             shutil.rmtree(temp_dir_name)
             for file_name in temp_file_names:
@@ -334,6 +348,7 @@ class ExportStep(Step):
 
     def process(self, p: Payload) -> Payload:
         msg.info(f"Exporting {self.output_file}")
+        logging.debug(p.__dict__)
         TransformerSingleton.instance().build(
             input_array=p.message,
             sample_rate_in=p.sample_rate,

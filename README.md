@@ -2,6 +2,8 @@
 
 apply an effects pipeline to a song.
 
+(held together by elmer's glue)
+
 ## Usage:
 
 ````shell
@@ -62,8 +64,9 @@ http://vstplanet.com/Effects/Effects.htm
 ## TODOs
 
 - code
-    - add youtube url support as input
-    - Shell full step support
+    - [X] add youtube url support as input
+    - [X] Shell full step support
+    - Memento Pattern  
     - Gui 
       - node-based gui internals
     - add tests
@@ -71,5 +74,5 @@ http://vstplanet.com/Effects/Effects.htm
 - infrastructure
     - [X] add setup.py
     - [X] add building exe
-    - add pybuilder  
     - add asciicinema gif in readme
+    - add pybuilder  
