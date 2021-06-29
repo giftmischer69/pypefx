@@ -21,8 +21,12 @@ class Payload:
     def get_wav_input_array(self, input_file: str):
         msg.info(f"Preparing input_file: {input_file}")
         input_file_resolved = Path(input_file).absolute().__str__()
-        input_file_replaced = Path(input_file.replace(" ", "_")).absolute().__str__()
-        shutil.copy(input_file_resolved, input_file_replaced)
+        input_file_replaced = input_file_resolved
+        delete: bool = False
+        if " " in input_file_replaced:
+            input_file_replaced = Path(input_file.replace(" ", "_")).absolute().__str__()
+            shutil.copy(input_file_resolved, input_file_replaced)
+            delete = True
         final_input = input_file_replaced
         input_file_replaced_wav = None
         if not input_file_replaced.endswith(".wav"):
@@ -35,7 +39,7 @@ class Payload:
 
         message = sox.Transformer().build_array(input_filepath=final_input)
         os.remove(input_file_replaced)
-        if input_file_replaced_wav:
+        if input_file_replaced_wav and delete:
             os.remove(input_file_replaced_wav)
 
         return message

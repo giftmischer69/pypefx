@@ -347,7 +347,7 @@ class ExportStep(Step):
         self.output_file = Path(f"./{output_file}").absolute().__str__()
 
     def process(self, p: Payload) -> Payload:
-        msg.info(f"Exporting {self.output_file}")
+        logging.info(f"Exporting {self.output_file}")
         logging.debug(p.__dict__)
         TransformerSingleton.instance().build(
             input_array=p.message,

@@ -1,3 +1,5 @@
+import logging
+
 import sox
 
 
@@ -11,7 +13,7 @@ class TransformerSingleton:
     @classmethod
     def instance(cls):
         if cls._instance is None:
-            print("Creating new instance")
+            logging.debug("Creating new instance")
             cls._instance = sox.Transformer()  # cls.__new__(cls)
             cls._instance.set_globals(
                 dither=True, guard=True, multithread=True, replay_gain=True, verbosity=0
