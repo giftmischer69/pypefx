@@ -63,16 +63,28 @@ http://vstplanet.com/Effects/Effects.htm
 
 ## TODOs
 
-- code
-    - [X] add youtube url support as input
-    - [X] Shell full step support
-    - Memento Pattern  
-    - Gui 
-      - node-based gui internals
-    - add tests
-    - add folder as input
-- infrastructure
-    - [X] add setup.py
-    - [X] add building exe
-    - add asciicinema gif in readme
-    - add pybuilder  
+- make it possible
+  - [X] core functionality
+  - [X] add youtube url support as input
+  - [X] Shell full step support
+  - [X] Memento Pattern  
+  - [X] add setup.py
+  - [X] add building exe
+  - add pybuilder
+  - add asciicinema gif in readme
+  - make Gui possible 
+    - node-based gui internals
+  - add tests
+  - add support for a folder as input
+- make it beautiful
+  - rewrite (some) class structure
+  - add readthedocs documentation
+  - document avialable steps in readme
+  - maybe add python fire cli for pypefx --steps bass +3 gain -3 vst "plugins/test.dll" "plugins/test.fxp"  
+  - pylint, pybuilder, etc...
+- make it fast
+  - performance (multithreading, etc.)
+  - cython
+- make a full release (1.0.0)   
+- linux support 
+  - test linux wine support (ubuntu/pop_os)
