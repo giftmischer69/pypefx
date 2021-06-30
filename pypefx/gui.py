@@ -60,6 +60,7 @@ class StepNode(Node):
                 default_value=self.step.factor,
                 label="factor",
                 no_input=True,  # TODO Temp
+                width=150
             )
         elif step_class == SoxSpeedStep:
             logging.debug("Chose: SoxSpeedStep")
@@ -172,8 +173,7 @@ class OutputNode(Node):
 
 
 class Gui:
-    def __init__(self, pipeline: Pipeline, cfg: DictConfig):
-        self.cfg = cfg
+    def __init__(self, pipeline: Pipeline):
         self.pipeline = pipeline
         self.main_window_name = "Main"
         self.themes = [

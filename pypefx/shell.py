@@ -12,6 +12,7 @@ from numpy.core.defchararray import isnumeric
 from wasabi import msg
 
 from pypefx._version import __version__
+from pypefx.memento import Memento
 from pypefx.payload import Payload
 from pypefx.pipeline import Pipeline
 from pypefx.steps import (
@@ -30,10 +31,6 @@ from pypefx.steps import (
 )
 
 
-def is_present(in_file):
-    return not (in_file is None or in_file == "" or not Path(in_file).exists())
-
-
 class Shell(Cmd):
     def __init__(self, pipeline: Pipeline):
         super().__init__()
@@ -43,6 +40,7 @@ class Shell(Cmd):
     def preloop(self) -> None:
         msg.good(f"Hello from pyepfx Version: {__version__}")
         self.do_help("")
+        self.init_memento()
 
     def do_q(self, line):
         """ Quits the Shell """
@@ -80,6 +78,7 @@ class Shell(Cmd):
         with open(file_path, "w") as f:
             f.write(yaml.dump(self.pipeline))
 
+    @Memento.undoable
     def do_load(self, line):
         """ Loads the pipeline from a file """
         if line is None or line == "" or line.strip() == "":
@@ -118,12 +117,13 @@ class Shell(Cmd):
 
                 self.pipeline.add_step(ExportStep(out_file))
 
-        if not is_present(in_file):
+        if not self.is_present(in_file):
             in_file = self.ask_file_indexed(".", ".mp3")
 
         payload = Payload(in_file)
         self.pipeline.process(payload)
 
+    @Memento.undoable
     def do_add(self, line):
         """ Adds a processing step to the pipeline """
         step_choices = [
@@ -219,16 +219,31 @@ class Shell(Cmd):
 
         msg.error("Something went wrong")
 
+    @Memento.undoable
     def do_remove(self, line):
-        # TODO add feature: remove step
-        pass
+        """ removes a step from the pipeline """
+        step = self.ask_indexed(self.pipeline.steps)
+        self.pipeline.steps.remove(step)
 
-    # TODO add feature: memento pattern (with decorator) / undo / redo
+    @Memento.undoable
+    def do_rearrange(self, line):
+        """ moves a step to a different position """
+        step = self.ask_indexed(self.pipeline.steps)
+        index = self.ask_int("at which position should the step be?")
+        self.pipeline.steps.remove(step)
+        self.pipeline.steps.insert(index, step)
+
     def do_undo(self, line):
-        pass
+        """ undoes the last operation """
+        self.pipeline = Memento.undo()
 
     def do_redo(self, line):
-        pass
+        """ redoes the last operation """
+        self.pipeline = Memento.redo()
+
+    def do_rename(self, line):
+        """ renames the current project """
+        self.pipeline.name = self.ask_string("enter new project name")
 
     def ask_string(self, prompt):
         return input(f"{prompt}\n : ")
@@ -352,3 +367,10 @@ class Shell(Cmd):
                     steps.append(ExportStep(out_file))
 
         return steps
+
+    def is_present(self, in_file):
+        return not (in_file is None or in_file == "" or not Path(in_file).exists())
+
+    @Memento.undoable
+    def init_memento(self):
+        pass

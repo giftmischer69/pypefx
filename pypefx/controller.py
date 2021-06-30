@@ -5,6 +5,8 @@ import sys
 from enum import Enum
 from pathlib import Path
 
+from pypefx.gui import Gui
+
 from pypefx.commandrunner import CommandRunner
 
 from pypefx.steps import ExportStep
@@ -133,6 +135,7 @@ def main():
 
     if args.profile:
         s.do_load(args.profile)
+        p = s.pipeline
 
     output_file = None
     if args.output:
@@ -161,4 +164,6 @@ def main():
     elif args.mode == Mode.SHELL.name:
         s.cmdloop()
     elif args.mode == Mode.GUI.name:
+        g = Gui(p)
+        g.run()
         msg.fail("Gui not Implemented yet")

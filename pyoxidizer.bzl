@@ -1,5 +1,5 @@
 def make_dist():
-    return default_python_distribution()
+    return default_python_distribution(python_version = "3.8")
 
 def make_exe(dist):
     policy = dist.make_python_packaging_policy()
